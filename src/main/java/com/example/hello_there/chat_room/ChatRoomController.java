@@ -109,7 +109,7 @@ public class ChatRoomController {
     }
 
     // 채팅방 나가기
-    // 의도적으로 웹 소켓 연결을 끊는 API
+    // 의도적으로 웹 소켓 연결을 끊는 API이다.
     @DeleteMapping("/room/{roomId}")
     public BaseResponse<String> exitChatRoom(@PathVariable String roomId){
         // roomId 기준으로 chatRoom 삭제, 해당 채팅룸 안에 있는 사진, 메시지 삭제
