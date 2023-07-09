@@ -16,7 +16,6 @@ import com.example.hello_there.utils.S3Service;
 import com.example.hello_there.utils.Secret;
 import com.example.hello_there.utils.UtilService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -220,7 +219,7 @@ public class ChatRoomService {
 
     // 채팅방 나가기
     @Transactional
-    public void deleteChatRoom(Long userId, String roomId) throws BaseException {
+    public void exitChatRoom(Long userId, String roomId) throws BaseException {
         utilService.findChatRoomByChatRoomIdWithValidation(roomId);
         userChatRoomRepository.deleteUserChatRoomByUserIdWithRoomId(userId, roomId);
         minusUserCount(roomId); // 프론트의 클라이언트 코드에서 웹 소켓 연결을 끊어주어야 한다.

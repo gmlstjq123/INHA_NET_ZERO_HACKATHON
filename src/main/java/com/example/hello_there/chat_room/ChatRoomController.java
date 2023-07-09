@@ -7,13 +7,9 @@ import com.example.hello_there.login.jwt.JwtService;
 import com.example.hello_there.user.User;
 import com.example.hello_there.utils.UtilService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -113,12 +109,13 @@ public class ChatRoomController {
     }
 
     // 채팅방 나가기
+    // 의도적으로 웹 소켓 연결을 끊는 API
     @DeleteMapping("/room/{roomId}")
-    public BaseResponse<String> deleteChatRoom(@PathVariable String roomId){
+    public BaseResponse<String> exitChatRoom(@PathVariable String roomId){
         // roomId 기준으로 chatRoom 삭제, 해당 채팅룸 안에 있는 사진, 메시지 삭제
         try {
             Long userId = jwtService.getUserIdx();
-            chatRoomService.deleteChatRoom(userId, roomId);
+            chatRoomService.exitChatRoom(userId, roomId);
             User user = utilService.findByUserIdWithValidation(userId);
             String result = user.getNickName() + "님이 " + roomId + "번 채팅방을 나갔습니다.";
             return new BaseResponse<>(result);
