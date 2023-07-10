@@ -22,10 +22,10 @@ public class Board extends BaseTimeEntity {
     private Long boardId;
 
     @Column(nullable = false)
-    private String title;
+    private String title; // 제목
 
     @Column(nullable = false)
-    private String content;
+    private String content; // 내용
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
