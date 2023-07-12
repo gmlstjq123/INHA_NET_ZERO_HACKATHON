@@ -59,12 +59,8 @@ public class CommentController {
     }
     /** 게시글에 달린 댓글 전체 조회 **/
     @GetMapping("/list-up/board/{board-id}")
-    public BaseResponse<List<GetCommentByBoardRes>> getCommentsByBoardId(@PathVariable(name = "board-id") Long boardId) {
-        try{
-            return new BaseResponse<>(commentService.getCommentsByBoard(boardId));
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
+    public List<GetCommentByBoardRes> getCommentsByBoardId(@PathVariable(name = "board-id") Long boardId) {
+        return commentService.getCommentsByBoard(boardId);
     }
 
     /** 댓글을 Id로 삭제하기 **/

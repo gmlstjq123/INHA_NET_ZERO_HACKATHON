@@ -5,6 +5,9 @@ import com.example.hello_there.univ.dto.GetUnivScoreRes;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import com.google.gson.reflect.TypeToken;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -47,29 +50,58 @@ public class UniversityService {
         return univs;
     }
 
-    public List<GetUnivScoreRes> getScoreList() throws BaseException {
-        return getUnivListRes(Comparator.comparing(GetUnivScoreRes::getTotalScore));
-    }
+    public Page<GetUnivScoreRes> getScoreList(Pageable pageable) throws BaseException {
+        List<GetUnivScoreRes> univScoreResList = getUnivListRes(Comparator.comparing(GetUnivScoreRes::getTotalScore));
 
-    public List<GetUnivScoreRes> getPartRateList() throws BaseException {
-        try {
-            List<University> univs = universityRepository.findUnivs();
-            List<GetUnivScoreRes> getUnivScoreRes = univs.stream()
-                    .map(univ -> new GetUnivScoreRes(univ.getUnivId(), univ.getUnivName(), univ.getTotalScore(),
-                            univ.getUserCount(), univ.getPartRate()))
-                    .collect(Collectors.toList());
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<GetUnivScoreRes> pagedUnivScoreResList;
 
-            // partRate 필드를 기준으로 내림차순 정렬
-            Collections.sort(getUnivScoreRes, Comparator.comparing(GetUnivScoreRes::getPartRate).reversed());
-
-            return getUnivScoreRes;
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
+        if (univScoreResList.size() < startItem) {
+            pagedUnivScoreResList = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, univScoreResList.size());
+            pagedUnivScoreResList = univScoreResList.subList(startItem, toIndex);
         }
+
+        return new PageImpl<>(pagedUnivScoreResList, pageable, univScoreResList.size());
     }
 
-    public List<GetUnivScoreRes> getUserCountList() throws BaseException {
-        return getUnivListRes(Comparator.comparing(GetUnivScoreRes::getPartRate));
+    public Page<GetUnivScoreRes> getPartRateList(Pageable pageable) throws BaseException {
+        List<GetUnivScoreRes> univScoreResList = getUnivListRes(Comparator.comparing(GetUnivScoreRes::getPartRate));
+
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<GetUnivScoreRes> pagedUnivScoreResList;
+
+        if (univScoreResList.size() < startItem) {
+            pagedUnivScoreResList = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, univScoreResList.size());
+            pagedUnivScoreResList = univScoreResList.subList(startItem, toIndex);
+        }
+
+        return new PageImpl<>(pagedUnivScoreResList, pageable, univScoreResList.size());
+    }
+
+    public Page<GetUnivScoreRes> getUserCountList(Pageable pageable) throws BaseException {
+        List<GetUnivScoreRes> univScoreResList = getUnivListRes(Comparator.comparing(GetUnivScoreRes::getUserCount));
+
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<GetUnivScoreRes> pagedUnivScoreResList;
+
+        if (univScoreResList.size() < startItem) {
+            pagedUnivScoreResList = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, univScoreResList.size());
+            pagedUnivScoreResList = univScoreResList.subList(startItem, toIndex);
+        }
+
+        return new PageImpl<>(pagedUnivScoreResList, pageable, univScoreResList.size());
     }
 
     private List<GetUnivScoreRes> getUnivListRes(Comparator<GetUnivScoreRes> comparing) throws BaseException {
@@ -80,7 +112,6 @@ public class UniversityService {
                             univ.getUserCount(), univ.getPartRate()))
                     .collect(Collectors.toList());
 
-            // 가입 회원 수 필드를 기준으로 내림차순 정렬
             Collections.sort(getUnivScoreRes, comparing.reversed());
 
             return getUnivScoreRes;

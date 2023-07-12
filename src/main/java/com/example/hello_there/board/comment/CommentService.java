@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -78,8 +79,7 @@ public class CommentService {
     }
 
     /** 게시글에 달린 댓글 전체 조회 **/
-    public List<GetCommentByBoardRes> getCommentsByBoard(Long boardId) throws BaseException {
-        try {
+    public List<GetCommentByBoardRes> getCommentsByBoard(Long boardId) {
             List<Comment> comments = commentRepository.findCommentsByBoardId(boardId);
             List<GetCommentByBoardRes> getCommentByBoardRes = new ArrayList<>();
 
@@ -88,14 +88,20 @@ public class CommentService {
 
             for (Comment comment : comments) {
                 String nickName = comment.getNickName();
+                String imgUrl = null;
+                String fileName = null;
+                if (comment.getUser().getProfile() != null) {
+                    imgUrl = comment.getUser().getProfile().getProfileUrl();
+                    fileName = comment.getUser().getProfile().getProfileFileName();
+                }
                 String reply = comment.getReply();
                 LocalDateTime createDate = comment.getCreateDate();
-                getCommentByBoardRes.add(new GetCommentByBoardRes(nickName, reply, createDate));
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd HH:mm");
+                String formattedDate = createDate.format(formatter);
+                getCommentByBoardRes.add(new GetCommentByBoardRes(nickName, imgUrl,
+                        fileName, reply, formattedDate));
             }
             return getCommentByBoardRes;
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
     }
 
     /** 댓글 삭제 **/

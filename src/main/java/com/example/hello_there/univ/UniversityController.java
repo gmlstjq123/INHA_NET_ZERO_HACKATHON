@@ -4,6 +4,9 @@ import com.example.hello_there.exception.BaseException;
 import com.example.hello_there.exception.BaseResponse;
 import com.example.hello_there.univ.dto.GetUnivScoreRes;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
@@ -21,43 +24,6 @@ public class UniversityController {
 
     private final UniversityRepository universityRepository;
     private final UniversityService universityService;
-
-    // 대학교 검색
-    @GetMapping("/search")
-    public BaseResponse<List<String>> getUnivBySimilarName(@RequestParam String univName) {
-        return new BaseResponse<>(universityService.getUnivBySimilarName(univName));
-    }
-
-
-    // 대학교 총점 순위를 조회하는 API
-    @GetMapping("/score")
-    public BaseResponse<List<GetUnivScoreRes>> getScoreList() {
-        try{
-            return new BaseResponse<>(universityService.getScoreList());
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
-    }
-
-    // 대학교 참여율 순위를 조회하는 API
-    @GetMapping("/part-rate")
-    public BaseResponse<List<GetUnivScoreRes>> getPartRateList() {
-        try{
-            return new BaseResponse<>(universityService.getPartRateList());
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
-    }
-
-    // 대학별 가입 인원 순위를 조회하는 API
-    @GetMapping("/user-count")
-    public BaseResponse<List<GetUnivScoreRes>> getUserCountList() {
-        try{
-            return new BaseResponse<>(universityService.getUserCountList());
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
-    }
 
     @PostMapping("/auto-register")
     public BaseResponse<String> registerUniv() {
@@ -85,6 +51,49 @@ public class UniversityController {
             throw new RuntimeException(e);
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    // 대학교 검색
+    @GetMapping("/search")
+    public BaseResponse<List<String>> getUnivBySimilarName(@RequestParam String univName) {
+        return new BaseResponse<>(universityService.getUnivBySimilarName(univName));
+    }
+
+
+    // 대학교 총점 순위를 조회하는 API
+    @GetMapping("/score")
+    public BaseResponse<Page<GetUnivScoreRes>> getScoreList() {
+        try {
+            Pageable pageable = PageRequest.of(0, 10);
+            Page<GetUnivScoreRes> scoreListPage = universityService.getScoreList(pageable);
+            return new BaseResponse<>(scoreListPage);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    // 대학교 참여율 순위를 조회하는 API
+    @GetMapping("/part-rate")
+    public BaseResponse<Page<GetUnivScoreRes>> getPartRateList() {
+        try{
+            Pageable pageable = PageRequest.of(0, 10);
+            Page<GetUnivScoreRes> scoreListPage = universityService.getPartRateList(pageable);
+            return new BaseResponse<>(scoreListPage);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    // 대학별 가입 인원 순위를 조회하는 API
+    @GetMapping("/user-count")
+    public BaseResponse<Page<GetUnivScoreRes>> getUserCountList() {
+        try{
+            Pageable pageable = PageRequest.of(0, 10);
+            Page<GetUnivScoreRes> scoreListPage = universityService.getUserCountList(pageable);
+            return new BaseResponse<>(scoreListPage);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
         }
     }
 }
