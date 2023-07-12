@@ -8,6 +8,8 @@ import com.example.hello_there.login.dto.JwtResponseDTO;
 import com.example.hello_there.login.jwt.JwtProvider;
 import com.example.hello_there.login.jwt.Token;
 import com.example.hello_there.login.jwt.TokenRepository;
+import com.example.hello_there.univ.University;
+import com.example.hello_there.univ.UniversityRepository;
 import com.example.hello_there.user.dto.*;
 import com.example.hello_there.user.profile.Profile;
 import com.example.hello_there.user.profile.ProfileRepository;
@@ -46,8 +48,8 @@ public class UserService {
     private final JwtProvider jwtProvider;
     private final UtilService utilService;
     private final ProfileService profileService;
-    // private final BCryptPasswordEncoder bCryptPasswordEncoder; // spring security login 사용 시 필요
     private final RedisTemplate redisTemplate;
+    private final UniversityRepository universityRepository;
 
     /**
      * 유저 생성 후 DB에 저장(회원 가입) with JWT
@@ -57,27 +59,53 @@ public class UserService {
         if(userRepository.findByEmailCount(postUserReq.getEmail()) >= 1) {
             throw new BaseException(POST_USERS_EXISTS_EMAIL);
         }
-        if(postUserReq.getPassword().isEmpty()){
+        if(postUserReq.getPassword() == null || postUserReq.getPassword().isEmpty() ){
             throw new BaseException(PASSWORD_CANNOT_BE_NULL);
+        }
+        if (postUserReq.getPassword().length() < 8 || postUserReq.getPassword().length() > 12) {
+            throw new BaseException(PASSWORD_LENGTH_INVALID);
+        }
+        if (!postUserReq.getPassword().equals(postUserReq.getPasswordChk())) {
+            throw new BaseException(PASSWORD_NOT_SAME);
         }
         String pwd;
         try{
-            // 암호화: postUserReq에서 제공받은 비밀번호를 보안을 위해 암호화시켜 DB에 저장합니다.
-            // ex) password123 -> dfhsjfkjdsnj4@!$!@chdsnjfwkenjfnsjfnjsd.fdsfaifsadjfjaf
             pwd = new AES128(Secret.USER_INFO_PASSWORD_KEY).encrypt(postUserReq.getPassword()); // 암호화코드
         }
         catch (Exception ignored) { // 암호화가 실패하였을 경우 에러 발생
             throw new BaseException(PASSWORD_ENCRYPTION_ERROR);
         }
         try {
+            if(!nickNameChk(postUserReq.getNickName())) {
+                throw new BaseException(NICKNAME_ERROR);
+            }
             User user = new User();
-            user.createUser(postUserReq.getEmail(), pwd, postUserReq.getNickName(), postUserReq.isGender(), postUserReq.getBirth());
+            user.createUser(postUserReq.getEmail(), postUserReq.getName(), pwd, postUserReq.getNickName());
+            University univ = universityRepository.findUnivByName(postUserReq.getUnivName()).orElse(null);
+            if(univ == null) {
+                throw new BaseException(NONE_EXIST_UNIV);
+            }
+            user.setUniv(univ);
             userRepository.save(user);
+            univ.setUserCount(user.getUniv().getUserCount()+1); // 유저 수 증가
+            universityRepository.save(univ);
+
             return new PostUserRes(user.getId(), user.getNickName());
-        } catch (Exception exception) { // DB에 이상이 있는 경우 에러 메시지를 보낸다.
-            throw new BaseException(DATABASE_ERROR);
+        } catch (BaseException exception) {
+            throw new BaseException(exception.getStatus());
         }
     }
+
+    /**
+     * 닉네임 체크
+     */
+    public Boolean nickNameChk(String nickName) {
+        if(userRepository.findByNickNameCount(nickName) >= 1) {
+            return false;
+        }
+        return true;
+    }
+
 
     /**
      * 유저 로그인 with JWT
@@ -118,9 +146,16 @@ public class UserService {
         try{
             List<User> users = userRepository.findUsers(); // User를 List로 받아 GetUserRes로 바꿔줌
             List<GetUserRes> getUserRes = users.stream()
-                    .map(user -> new GetUserRes(user.getId(), user.getEmail(), user.getNickName(), user.isGender(),
-                            Optional.ofNullable(user.getBirth()).map(LocalDate::toString).orElse(null),
-                            user.isManager(), user.getStatus()))
+                    .map(user -> {
+                        String profileUrl = null;
+                        String profileFileName = null;
+                        if (user.getProfile() != null) {
+                            profileUrl = user.getProfile().getProfileUrl();
+                            profileFileName = user.getProfile().getProfileFileName();
+                        }
+                        return new GetUserRes(user.getId(), profileUrl, profileFileName, user.getEmail(),
+                                user.getName(), user.getUniv().getUnivName(), user.getNickName());
+                    })
                     .collect(Collectors.toList());
             return getUserRes;
         } catch (Exception exception) {
@@ -135,9 +170,66 @@ public class UserService {
         try{
             List<User> users = userRepository.findUserByNickName(nickname);
             List<GetUserRes> getUserRes = users.stream()
-                    .map(user -> new GetUserRes(user.getId(), user.getEmail(), user.getNickName(), user.isGender(),
-                            Optional.ofNullable(user.getBirth()).map(LocalDate::toString).orElse(null),
-                            user.isManager(), user.getStatus()))
+                    .map(user -> {
+                        String profileUrl = null;
+                        String profileFileName = null;
+                        if (user.getProfile() != null) {
+                            profileUrl = user.getProfile().getProfileUrl();
+                            profileFileName = user.getProfile().getProfileFileName();
+                        }
+                        return new GetUserRes(user.getId(), profileUrl, profileFileName, user.getEmail(),
+                                user.getName(), user.getUniv().getUnivName(), user.getNickName());
+                    })
+                    .collect(Collectors.toList());
+            return getUserRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * 대학에 속한 유저 조회
+     */
+    public List<GetUserRes> getUsersByUnivName(String univName) throws BaseException {
+        try {
+            List<User> users = userRepository.findUserByUniv(univName);
+            List<GetUserRes> getUserRes = users.stream()
+                    .map(user -> {
+                        String profileUrl = null;
+                        String profileFileName = null;
+                        if (user.getProfile() != null) {
+                            profileUrl = user.getProfile().getProfileUrl();
+                            profileFileName = user.getProfile().getProfileFileName();
+                        }
+                        return new GetUserRes(user.getId(), profileUrl, profileFileName, user.getEmail(),
+                                user.getName(), user.getUniv().getUnivName(), user.getNickName());
+                    })
+                    .collect(Collectors.toList());
+            return getUserRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * 본인과 같은 대학에 속한 유저 조회
+     */
+    public List<GetUserRes> getUsersByMyUniv(Long userId) throws BaseException {
+        try {
+            User findUser = utilService.findByUserIdWithValidation(userId);
+            University univ = findUser.getUniv();
+            List<User> users = userRepository.findUserByUniv(univ.getUnivName());
+            List<GetUserRes> getUserRes = users.stream()
+                    .map(user -> {
+                        String profileUrl = null;
+                        String profileFileName = null;
+                        if (user.getProfile() != null) {
+                            profileUrl = user.getProfile().getProfileUrl();
+                            profileFileName = user.getProfile().getProfileFileName();
+                        }
+                        return new GetUserRes(user.getId(), profileUrl, profileFileName, user.getEmail(),
+                                user.getName(), user.getUniv().getUnivName(), user.getNickName());
+                    })
                     .collect(Collectors.toList());
             return getUserRes;
         } catch (Exception exception) {
@@ -151,9 +243,12 @@ public class UserService {
     @Transactional
     public void modifyUserNickName(PatchUserReq patchUserReq) {
         User user = userRepository.getReferenceById(patchUserReq.getUserId());
-        user.updateNickName(patchUserReq.getNickName());
+        user.setNickName(patchUserReq.getNickName());
     }
 
+    /**
+     * 유저 삭제
+     */
     @Transactional
     public String deleteUser(Long userId) throws BaseException{
         User user = utilService.findByUserIdWithValidation(userId);

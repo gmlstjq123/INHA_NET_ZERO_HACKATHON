@@ -37,8 +37,19 @@ public class CommentController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+    /** 내 댓글 기록 조회 **/
+    @GetMapping("/list-up/user/my")
+    public BaseResponse<List<GetCommentRes>> getMyComments() {
+        try{
+            Long userId = jwtService.getUserIdx();
+            return new BaseResponse<>(commentService.getComments(userId));
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
     /** 멤버의 댓글 기록 조회 **/
-    @GetMapping("/list-up/member/{user-id}")
+    @GetMapping("/list-up/user/{user-id}")
     public BaseResponse<List<GetCommentRes>> getComments(@PathVariable(name = "user-id") Long userId) {
         try{
             return new BaseResponse<>(commentService.getComments(userId));

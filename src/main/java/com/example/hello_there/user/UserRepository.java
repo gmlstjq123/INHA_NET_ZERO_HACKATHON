@@ -18,6 +18,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select count(u) from User u where u.email = :email")
     Integer findByEmailCount(@Param("email") String email);
 
+    @Query("select count(u) from User u where u.nickName = :nickName")
+    Integer findByNickNameCount(@Param("nickName") String nickName);
+
     @Query("select u from User u where u.email = :email")
     User findUserByEmail(@Param("email") String email);
 
@@ -26,6 +29,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select u from User u where u.nickName = :nickName")
     List<User> findUserByNickName(@Param("nickName") String nickName);
+
+    @Query("select u from User u where u.univ.univName = :univName")
+    List<User> findUserByUniv(@Param("univName") String univName);
 
     @Modifying
     @Query("delete from User u where u.email = :email")

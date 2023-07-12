@@ -1,9 +1,6 @@
 package com.example.hello_there.login.kakao;
 
-import com.example.hello_there.exception.BaseException;
 import com.example.hello_there.exception.BaseResponse;
-import com.example.hello_there.exception.BaseResponseStatus;
-import com.example.hello_there.login.dto.AssertionDTO;
 import com.example.hello_there.login.dto.JwtResponseDTO;
 import com.example.hello_there.login.jwt.JwtProvider;
 import com.example.hello_there.login.jwt.JwtService;
@@ -12,7 +9,6 @@ import com.example.hello_there.login.jwt.TokenRepository;
 import com.example.hello_there.user.User;
 import com.example.hello_there.user.UserRepository;
 import com.example.hello_there.user.UserService;
-import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,8 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.example.hello_there.exception.BaseResponseStatus.*;
@@ -41,15 +35,18 @@ public class KakaoController {
     @ResponseBody
     @PostMapping("/oauth/kakao")
     // public BaseResponse<?> kakaoCallback(String code) { // 실제 프로덕션 환경에서는 주석을 풀어야 함.
-    public BaseResponse<?> kakaoCallback(@RequestParam("accToken") String accessToken) {
+    public BaseResponse<?> kakaoCallback(@RequestParam("code") String code) {
 //        String accessToken = googleService.getAccessToken(code);
 //        Gson gsonObj = new Gson();
 //        Map<?, ?> data = gsonObj.fromJson(accessToken, Map.class);
 //        String atoken = (String) data.get("access_token");
-        String userEmail = kaKaoLoginService.getUserEmail(accessToken);
+        String userEmail = kaKaoLoginService.getUserEmail(code);
         Optional<User> findUser = userRepository.findByEmail(userEmail);
         if (!findUser.isPresent()) { // 회원가입인 경우
-            User kakaoUser = kaKaoLoginService.getUserInfo(accessToken);
+            String email = kaKaoLoginService.getUserEmail(code);
+            String nickName = kaKaoLoginService.getUserNickname(code);
+            User kakaoUser = new User();
+            kakaoUser.createUser(email, nickName, null, nickName);
             userRepository.save(kakaoUser);
             JwtResponseDTO.TokenInfo tokenInfo = jwtProvider.generateToken(kakaoUser.getId());
             Token token = new Token();
@@ -57,11 +54,7 @@ public class KakaoController {
             token.updateRefreshToken(tokenInfo.getRefreshToken());
             token.updateUser(kakaoUser);
             tokenRepository.save(token);
-            if(kakaoUser.getEmail() == "" | kakaoUser.getNickName() == "" | kakaoUser.getBirth() == LocalDate.now()) {
-                String message = "사용자 정보 제공에 동의하지 않아 기본 값으로 로그인 되었습니다. 마이페이지에서 본인의 정보를 알맞게 수정 후 이용해주세요.";
-                AssertionDTO assertionDTO = new AssertionDTO(tokenInfo, message);
-                return new BaseResponse<>(assertionDTO); // 이걸 예외처리하면 너무 복잡해질 거 같아, 그냥 기본값으로 세팅하고 로그인 처리하였다.
-            }
+
             return new BaseResponse<>(tokenInfo);
         }
         else { // 기존 회원이 로그인하는 경우

@@ -1,7 +1,6 @@
 package com.example.hello_there.login.google;
 
 import com.example.hello_there.exception.BaseResponse;
-import com.example.hello_there.login.dto.AssertionDTO;
 import com.example.hello_there.login.dto.JwtResponseDTO;
 import com.example.hello_there.login.jwt.JwtProvider;
 import com.example.hello_there.login.jwt.Token;
@@ -37,7 +36,7 @@ public class GoogleController {
             User findUser = userRepository.findByEmail(userEmail).orElse(null);
             if (findUser == null) { // 회원 가입
                 User googleUser = new User();
-                googleUser.createUser(userEmail, null, userName, true, null);
+                googleUser.createUser(userEmail, null, userName, userName);
                 userRepository.save(googleUser);
                 JwtResponseDTO.TokenInfo tokenInfo = jwtProvider.generateToken(googleUser.getId());
                 Token token = new Token();
@@ -45,10 +44,7 @@ public class GoogleController {
                 token.updateRefreshToken(tokenInfo.getRefreshToken());
                 token.updateUser(googleUser);
                 tokenRepository.save(token);
-                String message = "구글 정책 변경으로 인해 제공 받지 못한 정보에 대해 기본 값으로 가입되었습니다." +
-                        " 마이페이지에서 본인의 정보를 알맞게 수정 후 이용해주세요.";
-                AssertionDTO assertionDTO = new AssertionDTO(tokenInfo, message);
-                return new BaseResponse<>(assertionDTO);
+                return new BaseResponse<>(tokenInfo);
             } else {
                 JwtResponseDTO.TokenInfo tokenInfo = jwtProvider.generateToken(findUser.getId());
                 Token token = new Token();

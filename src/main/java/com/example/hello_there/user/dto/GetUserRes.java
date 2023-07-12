@@ -10,10 +10,10 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class GetUserRes {
     private Long userId;
+    private String imgUrl;
+    private String fileName;
     private String email;
+    private String name;
+    private String univName;
     private String nickName;
-    private boolean gender;
-    private String birth;
-    private boolean isManager;
-    private UserStatus status;
 }

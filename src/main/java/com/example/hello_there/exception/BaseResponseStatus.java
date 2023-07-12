@@ -15,20 +15,20 @@ public enum BaseResponseStatus {
      */
     // Common
     REQUEST_ERROR(false, 2000, "입력값을 확인해주세요."),
-    EMPTY_JWT(false, 2001, "JWT를 입력해주세요."),
-    INVALID_JWT(false, 2002, "유효하지 않은 JWT입니다."),
+    EMPTY_JWT(false, 2001, "JWT를 입력해주세요"),
+    INVALID_JWT(false, 2002, "유효하지 않은 JWT에요"),
     INVALID_USER_JWT(false,2003,"권한이 없는 유저의 접근입니다."),
-    NONE_EXIST_USER(false, 2006, "존재하지 않는 사용자입니다."),
+    NONE_EXIST_USER(false, 2006, "존재하지 않는 사용자에요"),
     // users
     USERS_EMPTY_USER_ID(false, 2010, "유저 아이디 값을 확인해주세요."),
     INVALID_MEMBER_ID(false, 2010, "멤버 아이디와 이메일이 일치하지 않습니다."),
     PASSWORD_CANNOT_BE_NULL(false, 2011, "비밀번호를 입력해주세요."),
     // [POST] /users
     POST_USERS_EMPTY_EMAIL(false, 2015, "이메일을 입력해주세요."),
-    POST_USERS_INVALID_EMAIL(false, 2016, "이메일 형식을 확인해주세요."),
-    POST_USERS_EXISTS_EMAIL(false,2017,"중복된 이메일입니다."),
-    POST_USERS_NONE_EXISTS_EMAIL(false,2018,"등록되지 않은 이메일입니다."),
-    LOG_OUT_USER(false,2019,"이미 로그아웃된 유저입니다."),
+    POST_USERS_INVALID_EMAIL(false, 2016, "올바른 이메일 형식이 아니에요"),
+    POST_USERS_EXISTS_EMAIL(false,2017,"중복된 이메일이에요"),
+    POST_USERS_NONE_EXISTS_EMAIL(false,2018,"등록되지 않은 이메일이에요"),
+    LOG_OUT_USER(false,2019,"이미 로그아웃된 유저에요"),
 
     // [POST] /boards
     POST_BOARDS_EMPTY_TITLE(false, 2019, "제목은 두 글자 이상으로 작성해주세요."),
@@ -46,8 +46,9 @@ public enum BaseResponseStatus {
     FAILED_TO_LOGIN(false,3014,"비밀번호가 틀렸습니다."),
     FAILED_TO_LOGOUT(false, 3015, "로그아웃에 실패하였습니다"),
     MEMBER_NOT_FOUND(false, 3016, "등록된 이메일이 아닙니다."),
-    INCORRECT_PASSWORD(false, 3017, "비밀번호가 틀렸습니다"),
-
+    INCORRECT_PASSWORD(false, 3017, "비밀번호가 틀렸어요"),
+    PASSWORD_NOT_SAME(false, 3018, "패스워드가 달라요"),
+    PASSWORD_LENGTH_INVALID(false, 3019, "패스워드 조건을 확인해주세요 (8 ~ 12글자 사이)"),
 
     /**
      * 4000 : Database, Server 오류
@@ -69,23 +70,25 @@ public enum BaseResponseStatus {
     /**
      *   5000 : Board 관련 오류
      */
-    NONE_EXIST_BOARD(false, 5000, "요청하신 게시글은 존재하지 않습니다."),
+    NONE_EXIST_BOARD(false, 5000, "요청하신 게시글은 존재하지 않아요"),
     INVALID_BOARD_ID(false, 5001, "유효하지 않은 입력입니다."),
     EXCEEDED_TITLE_LIMIT(false, 5002, "제목이 글자수 제한을 초과하였습니다."),
     EXCEEDED_CONTENT_LIMIT(false, 5003, "본문이 글자수 제한을 초과하였습니다."),
     BOARD_NOT_FOUND(false, 5004, "요청하신 제목의 게시글은 존재하지 않습니다."),
     SAME_TITLE_ERROR(false, 5005, "동일한 게시글이 2개 이상 존재해 수정을 진행할 수 없습니다."),
-    CANNOT_DELETE(false, 5006, "작성된 게시글이 존재하여 멤버를 삭제하는데 실패하였습니다."),
-    MEMBER_WITHOUT_PERMISSION(false, 5007, "본인의 게시글에 대해서만 수정 및 삭제가 가능합니다."),
+    CANNOT_DELETE(false, 5006, "작성된 게시글이 존재하여 멤버를 삭제할 수 없어요"),
+    MEMBER_WITHOUT_PERMISSION(false, 5007, "본인의 게시글에 대해서만 수정 및 삭제가 가능해요."),
 
     /**
      *   6000 : 회원등록 관련 오류
      */
-    NICKNAME_ERROR(false, 6000, "이미 존재하는 닉네임입니다."),
+    NICKNAME_ERROR(false, 6000, "이미 존재하는 닉네임이에요."),
     KAKAO_ERROR(false, 6001, "카카오 로그아웃에 실패했습니다."),
     INTRODUCE_ERROR(false, 6002, "한줄 소개는 0~30자이어야 합니다."),
     DISAGREE_TO_PROVIDE(false, 6003, "정보 제공에 동의해주세요."),
     ALREADY_LOGIN(false, 6004, "이미 로그인된 유저입니다."),
+    NONE_EXIST_UNIV(false, 6005, "대학교 등록을 먼저 진행해주세요"),
+    ALREADY_EXIST_UNIV(false, 6006, "이미 등록된 대학교에요"),
 
     /**
      *   7000 : 댓글 관련 오류

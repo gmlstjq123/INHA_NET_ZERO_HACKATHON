@@ -1,14 +1,12 @@
 package com.example.hello_there.user;
 
 import com.example.hello_there.board.Board;
+import com.example.hello_there.univ.University;
 import com.example.hello_there.user_chatroom.UserChatRoom;
 import com.example.hello_there.login.jwt.Token;
 import com.example.hello_there.user.profile.Profile;
 import com.example.hello_there.utils.BaseTimeEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -18,30 +16,25 @@ import java.util.List;
 @Entity
 @Builder
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class User extends BaseTimeEntity {
     @Column
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 멤버의 식별자
+    private Long id; // 유저의 식별자
 
     @Column(nullable = false)
     private String email; // 이메일로 로그인
 
     @Column(nullable = true) // 소셜로그인의 경우 null. 일반로그인일 경우 null이면 예외 호출
-    private String password;
+    private String password; // 일반 로그인을 위한 비밀번호
+
+    @Column(nullable = false)
+    private String name; // 유저의 이름
 
     @Column(nullable = false)
     private String nickName; // 유저의 닉네임
-
-    @Column(nullable = false)
-    private boolean gender; // 유저의 성별
-
-    @Column(nullable = false, columnDefinition = "boolean default false")
-    private boolean isManager; // 관리자 여부 체크
-
-    @Column(nullable = true)
-    private LocalDate birth; // 유저의 생년월일을 yyyy-mm-dd 형식으로 표현
 
     @Column(nullable = false) // status는 멤버 회원가입 시에 자동으로 ACTIVE로 설정됨.
     @Enumerated(EnumType.STRING)
@@ -53,6 +46,11 @@ public class User extends BaseTimeEntity {
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Profile profile; // 프로필 사진과 일대일 매핑
 
+    // 대학교와 관계 매핑
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "univ_id")
+    private University univ;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Board> boards = new ArrayList<>();
 
@@ -62,34 +60,13 @@ public class User extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Board> comments = new ArrayList<>();
-    public User createUser(String email, String password, String nickName, boolean gender, LocalDate birth){
+    public User createUser(String email, String name, String password, String nickName) {
         this.email = email;
+        this.name = name;
         this.password = password;
         this.nickName= nickName;
-        this.gender = gender;
-        if(birth != null) {
-            this.birth = birth;
-        }
         this.status = UserStatus.ACTIVE;
         return this;
     }
 
-    public void updateNickName(String nickName){
-        this.nickName = nickName;
-    }
-    public void updateEmail(String email){
-        this.email = email;
-    }
-
-    public void updateBirth(LocalDate birth){
-        this.birth = birth;
-    }
-
-    public void updateGender(boolean gender){
-        this.gender = gender;
-    }
-
-    public void updateStatus(UserStatus status){
-        this.status = status;
-    }
 }

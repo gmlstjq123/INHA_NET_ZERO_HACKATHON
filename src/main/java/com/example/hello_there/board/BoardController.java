@@ -38,6 +38,17 @@ public class BoardController {
         }
     }
 
+    /** 내 게시글 조회하기 **/
+    @GetMapping("/myboard")
+    public BaseResponse<List<GetBoardRes>> getMyBoard() {
+        try{
+            Long userId = jwtService.getUserIdx();
+            return new BaseResponse<>(boardService.getBoardById(userId));
+        } catch(BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
     /** 게시글을 멤버Id로 조회하기 **/
     @GetMapping("/board")
     public BaseResponse<List<GetBoardRes>> getBoard(@RequestParam(required = false) Long userId) {
@@ -52,7 +63,7 @@ public class BoardController {
     }
 
     /** 게시글을 Id로 삭제하기 **/
-    @DeleteMapping("/delete/{board-id}")
+    @DeleteMapping("/board/{board-id}")
     public BaseResponse<String> deleteBoard(@PathVariable(name = "board-id") Long boardId){
         try{
             Long memberId = jwtService.getUserIdx();

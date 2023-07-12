@@ -17,4 +17,6 @@ public class GetBoardRes {
     private String nickName;
     private String title;
     private String content;
+    private String firstImgUrl; // 썸네일 이미지
+    private String firstFileName; // 썸네일 이미지명
 }

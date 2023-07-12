@@ -71,19 +71,24 @@ public class BoardService {
     }
 
     @Transactional
-    public List<GetBoardRes> getBoards() throws BaseException{
-        try{
-            List<Board> boards = boardRepository.findBoards();
-            List<GetBoardRes> getBoardRes = boards.stream()
-                    .map(board -> new GetBoardRes(board.getBoardId(), board.getBoardType(),
+    public List<GetBoardRes> getBoards() {
+        List<Board> boards = boardRepository.findBoards();
+        List<GetBoardRes> getBoardRes = boards.stream()
+                .map(board -> {
+                    String imgUrl = "";
+                    String fileName = "";
+                    if(!board.getPhotoList().isEmpty()) {
+                        imgUrl = board.getPhotoList().get(0).getImgUrl();
+                        fileName = board.getPhotoList().get(0).getFileName();
+                    }
+                    return new GetBoardRes(board.getBoardId(), board.getBoardType(),
                             convertLocalDateTimeToLocalDate(board.getCreateDate()),
                             convertLocalDateTimeToTime(board.getCreateDate()),
-                            board.getUser().getNickName(), board.getTitle(), board.getContent()))
-                    .collect(Collectors.toList());
-            return getBoardRes;
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
+                            board.getUser().getNickName(), board.getTitle(), board.getContent(),
+                            imgUrl, fileName);
+                })
+                .collect(Collectors.toList());
+        return getBoardRes;
     }
 
     @Transactional
@@ -91,10 +96,19 @@ public class BoardService {
         try {
             List<Board> boards = boardRepository.findBoardByUserId(userId);
             List<GetBoardRes> getBoardRes = boards.stream()
-                    .map(board -> new GetBoardRes(board.getBoardId(), board.getBoardType(),
-                            convertLocalDateTimeToLocalDate(board.getCreateDate()),
-                            convertLocalDateTimeToTime(board.getCreateDate()),
-                            board.getUser().getNickName(), board.getTitle(), board.getContent()))
+                    .map(board -> {
+                        String imgUrl = "";
+                        String fileName = "";
+                        if(!board.getPhotoList().isEmpty()) {
+                            imgUrl = board.getPhotoList().get(0).getImgUrl();
+                            fileName = board.getPhotoList().get(0).getFileName();
+                        }
+                        return new GetBoardRes(board.getBoardId(), board.getBoardType(),
+                                convertLocalDateTimeToLocalDate(board.getCreateDate()),
+                                convertLocalDateTimeToTime(board.getCreateDate()),
+                                board.getUser().getNickName(), board.getTitle(), board.getContent(),
+                                imgUrl, fileName);
+                    })
                     .collect(Collectors.toList());
             return getBoardRes;
         } catch (Exception exception) {

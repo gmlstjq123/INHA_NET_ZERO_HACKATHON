@@ -44,6 +44,14 @@ public class UserController {
     }
 
     /**
+     * 닉네임 중복 확인
+     */
+    @GetMapping("/nickname-chk")
+    public BaseResponse<Boolean> nicknameChk(@RequestParam String nickName) {
+        return new BaseResponse<>(userService.nickNameChk(nickName));
+    }
+
+    /**
      * 로그인
      */
     @PostMapping("/log-in")
@@ -86,7 +94,7 @@ public class UserController {
      * 회원 조회
      * nickname이 파라미터에 없을 경우 모두 조회
      */
-    @GetMapping("Read")
+    @GetMapping("/read")
     public BaseResponse<List<GetUserRes>> getUsers(@RequestParam(required = false) String nickName){
         //  @RequestParam은, 1개의 HTTP Request 파라미터를 받을 수 있는 어노테이션(?뒤의 값).
         //  default로 RequestParam은 반드시 값이 존재해야 하도록 설정되어 있지만, (전송 안되면 400 Error 유발)
@@ -136,11 +144,32 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")
-    public BaseResponse<String> deleteUser(){
+    public BaseResponse<String> deleteUser() {
         try{
             Long userId = jwtService.getUserIdx();
             return new BaseResponse<>(userService.deleteUser(userId));
         } catch(BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    // 대학교에 속한 유저 리스트틀 조회하는 API
+    @GetMapping("/univ-user")
+    public BaseResponse<List<GetUserRes>> getUsersByUniv(@RequestParam String univName) {
+        try{
+            return new BaseResponse<>(userService.getUsersByUnivName(univName));
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    // 유저의 대학교에 속한 유저 리스트를 조회하는 API
+    @GetMapping("/myuniv-user")
+    public BaseResponse<List<GetUserRes>> getUsersByMyUniv() {
+        try{
+            Long userId = jwtService.getUserIdx();
+            return new BaseResponse<>(userService.getUsersByMyUniv(userId));
+        } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
     }
