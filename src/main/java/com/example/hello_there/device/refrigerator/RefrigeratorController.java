@@ -4,12 +4,17 @@ import com.example.hello_there.exception.BaseResponse;
 import com.example.hello_there.json.JSONFileController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,11 +22,11 @@ import java.util.List;
 public class RefrigeratorController {
     private final RefrigeratorRepository refrigeratorRepository;
     @GetMapping("/read")
-    public BaseResponse<List<JSONFileController.Ref>> getRefrigerators() {
-        List<Refrigerator> refList = refrigeratorRepository.findAll();
-        List<JSONFileController.Ref> resultList = new ArrayList<>();
+    public BaseResponse<Page<JSONFileController.Ref>> getRefrigerators() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Refrigerator> refPage = refrigeratorRepository.findAll(pageable);
 
-        for (Refrigerator ref : refList) {
+        List<JSONFileController.Ref> resultList = refPage.getContent().stream().map(ref -> {
             JSONFileController.Ref refData = new JSONFileController.Ref();
             refData.setCompanyName(ref.getCompanyName());
             refData.setModelName(ref.getModelName());
@@ -34,9 +39,11 @@ public class RefrigeratorController {
             refData.setName(ref.getName());
             refData.setPrice(ref.getPrice());
             refData.setScore(ref.getScore());
-            resultList.add(refData);
-        }
+            return refData;
+        }).collect(Collectors.toList());
 
-        return new BaseResponse<>(resultList);
+        Page<JSONFileController.Ref> resultPage = new PageImpl<>(resultList, pageable, refPage.getTotalElements());
+
+        return new BaseResponse<>(resultPage);
     }
 }
