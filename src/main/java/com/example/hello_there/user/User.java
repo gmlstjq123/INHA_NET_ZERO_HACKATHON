@@ -2,7 +2,6 @@ package com.example.hello_there.user;
 
 import com.example.hello_there.board.Board;
 import com.example.hello_there.univ.University;
-import com.example.hello_there.user_chatroom.UserChatRoom;
 import com.example.hello_there.login.jwt.Token;
 import com.example.hello_there.user.profile.Profile;
 import com.example.hello_there.utils.BaseTimeEntity;
@@ -53,9 +52,6 @@ public class User extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Board> boards = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserChatRoom> userChatRooms = new ArrayList<>();
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -4,8 +4,8 @@ import com.example.hello_there.board.Board;
 import com.example.hello_there.board.BoardRepository;
 import com.example.hello_there.board.comment.Comment;
 import com.example.hello_there.board.comment.CommentRepository;
-import com.example.hello_there.chat_room.ChatRoom;
-import com.example.hello_there.chat_room.ChatRoomRepository;
+import com.example.hello_there.device.Device;
+import com.example.hello_there.device.DeviceRepository;
 import com.example.hello_there.exception.BaseException;
 import com.example.hello_there.exception.BaseResponseStatus;
 import com.example.hello_there.login.jwt.Token;
@@ -32,7 +32,7 @@ public class UtilService {
     private final BoardRepository boardRepository;
     private final CommentRepository commentRepository;
     private final TokenRepository tokenRepository;
-    private final ChatRoomRepository chatRoomRepository;
+    private final DeviceRepository deviceRepository;
 
     public User findByUserIdWithValidation(Long userId) throws BaseException {
         User user = userRepository.findUserById(userId).orElse(null);
@@ -64,10 +64,10 @@ public class UtilService {
         return token;
     }
 
-    public ChatRoom findChatRoomByChatRoomIdWithValidation(String chatRoomId) throws BaseException {
-        ChatRoom chatRoom = chatRoomRepository.findChatRoomById(chatRoomId).orElse(null);
-        if(chatRoom == null) throw new BaseException(BaseResponseStatus.NONE_EXIST_ROOM);
-        return chatRoom;
+    public Device findByDeviceModelNameWithValidation(String modelName) throws BaseException {
+        Device device = deviceRepository.findDeviceByModelName(modelName).orElse(null);
+        if(device == null) throw new BaseException(BaseResponseStatus.NONE_EXIST_DEVICE);
+        return device;
     }
 
     public static String  convertLocalDateTimeToLocalDate(LocalDateTime localDateTime) {

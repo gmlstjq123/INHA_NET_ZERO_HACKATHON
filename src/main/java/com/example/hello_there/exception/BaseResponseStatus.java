@@ -34,7 +34,7 @@ public enum BaseResponseStatus {
     POST_BOARDS_EMPTY_TITLE(false, 2019, "제목은 두 글자 이상으로 작성해주세요."),
     INVALID_INPUT(false, 2020, "유효하지 않은 입력입니다."),
     FAIL_TO_LOAD(false, 2021, "게시글을 불러오는데 실패했어요"),
-
+    NONE_EXIST_DEVICE(false, 2022, "요청하신 기기는 존재하지 않아요"),
 
     /**
      * 3000 : Response 오류
