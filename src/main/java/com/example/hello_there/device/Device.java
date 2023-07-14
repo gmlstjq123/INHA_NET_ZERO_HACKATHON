@@ -14,13 +14,19 @@ public class Device {
     @Column
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long deviceId; // 기기의 식별자
+    private Long deviceId; //
+
+    @Column(nullable = false)
+    private DeviceType deviceType; // 업체명, 모델명, 연간에너지비용, 용량, 효율등급, 탄소배출량, 가격
 
     @Column(nullable = false)
     private String grade; // 에너지 등급
 
     @Column(nullable = false)
     private String modelName; // 모델명
+
+    @Column(nullable = false)
+    private String price; // 가격
 
     @Column(nullable = false)
     private double emissionsPerHour; // 시간당 이산화탄소배출량
