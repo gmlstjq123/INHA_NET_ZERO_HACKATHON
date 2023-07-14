@@ -134,8 +134,8 @@ public class DeviceService {
     // 엑셀파일을 Json으로 바꾸는 메서드
     @Transactional
     public void converetCsvToJson() throws CsvValidationException, IOException {
-        String csvFilePath = "경로/파일명.csv"; // CSV 파일 경로 및 이름
-        String jsonFilePath = "경로/파일명.json"; // JSON 파일 경로 및 이름
+        String csvFilePath = "C:\\inha_net_zero/ref.csv"; // CSV 파일 경로 및 이름
+        String jsonFilePath = "C:\\inha_net_zero/ref.json"; // JSON 파일 경로 및 이름
 
         try {
             FileReader reader = new FileReader(csvFilePath);
