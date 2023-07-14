@@ -24,10 +24,7 @@ public class Refrigerator {
     private String modelName; // 모델코드
 
     @Column(nullable = false)
-    private double monthlyConsumption; // 월간 소비전력량
-
-    @Column(nullable = false)
-    private double annualCost;
+    private double monthlyConsumption;
 
     @Column(nullable = false)
     private double volume; // 용량
@@ -37,6 +34,12 @@ public class Refrigerator {
 
     @Column(nullable = false)
     private double emissionsPerHour; // 시간당 이산화탄소배출량
+
+    @Column(nullable = false)
+    private double maxPowerConsumption; // 최대 소비전력량
+
+    @Column(nullable = false)
+    private double annualCost;
 
     @Column(nullable = false)
     private String name; // 모델명

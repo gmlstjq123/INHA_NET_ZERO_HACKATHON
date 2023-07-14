@@ -8,10 +8,7 @@ import com.example.hello_there.device.vaccum_cleaner.VaccumCleanerService;
 import com.example.hello_there.device.washing_machine.WashingMachineService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -138,17 +135,18 @@ public class JSONFileController {
                 String companyName = itemNode.get("업체명").asText();
                 String modelName = itemNode.get("모델명").asText();
                 double monthlyConsumption = itemNode.get("월간소비전력량(kwh/월)").asDouble();
-                double annualCost = itemNode.get("연간에너지비용(원)").asDouble();
                 double volume = itemNode.get("용량").asDouble();
                 String grade = itemNode.get("효율등급").asText();
                 double emissionPerHour = itemNode.get("시간당 이산화탄소 배출량").asDouble();
+                double maxPowerConsumption = itemNode.get("최대소비전력량").asDouble();
+                double annualCost = itemNode.get("연간에너지비용(원)").asDouble();
                 String name = itemNode.get("모델 이름").asText();
                 int price = itemNode.get("가격").asInt();
                 int score = itemNode.get("tanso_score").asInt();
 
                 // 품목 객체 생성
-                Ref ref = new Ref(companyName, modelName, monthlyConsumption, annualCost,
-                        volume, grade, emissionPerHour, name, price, score);
+                Ref ref = new Ref(companyName, modelName, monthlyConsumption, volume, grade,
+                        annualCost, emissionPerHour, maxPowerConsumption, name, price, score);
 
                 // 품목 객체를 리스트에 추가
                 refList.add(ref);
@@ -336,14 +334,16 @@ public class JSONFileController {
     @Getter
     @Setter
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class Ref {
         private String companyName;
         private String modelName;
         private double monthlyConsumption;
-        private double annualCost;
         private double volume;
         private String grade;
         private double emissionPerHour;
+        private double maxPowerConsumption;
+        private double annualCost;
         private String name;
         private int price;
         private int score;
@@ -352,6 +352,7 @@ public class JSONFileController {
     @Getter
     @Setter
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class Rice {
         private String companyName;
         private String modelName;
@@ -368,6 +369,7 @@ public class JSONFileController {
     @Getter
     @Setter
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class Vac {
         private String companyName;
         private String completeDate;
@@ -388,6 +390,7 @@ public class JSONFileController {
     @Getter
     @Setter
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class Wash {
         private String companyName;
         private String modelName;

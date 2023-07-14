@@ -65,8 +65,9 @@ public class DeviceController {
         Refrigerator refrigerator = refrigeratorRepository.findRefrigeratorByModelName(modelName).orElse(null);
         if(refrigerator != null) {
             JSONFileController.Ref ref = new JSONFileController.Ref(refrigerator.getCompanyName(), refrigerator.getModelName(),
-                    refrigerator.getMonthlyConsumption(), refrigerator.getAnnualCost(), refrigerator.getVolume(), refrigerator.getGrade(),
-                    refrigerator.getEmissionsPerHour(), refrigerator.getName(), refrigerator.getPrice(), refrigerator.getScore());
+                    refrigerator.getMonthlyConsumption(), refrigerator.getVolume(), refrigerator.getGrade(),
+                    refrigerator.getEmissionsPerHour(), refrigerator.getMaxPowerConsumption(), refrigerator.getAnnualCost(),
+                    refrigerator.getName(), refrigerator.getPrice(), refrigerator.getScore());
             return new BaseResponse<>(ref);
         }
         RiceCooker riceCooker = riceCookerRepository.findRiceCookerByModelName(modelName).orElse(null);
