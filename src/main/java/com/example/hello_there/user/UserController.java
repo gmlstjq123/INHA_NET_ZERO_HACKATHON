@@ -173,5 +173,10 @@ public class UserController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+    @GetMapping("/")
+    public String get() {
+        return "hello";
+    }
 }
 
