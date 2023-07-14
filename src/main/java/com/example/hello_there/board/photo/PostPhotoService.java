@@ -1,6 +1,6 @@
 package com.example.hello_there.board.photo;
 
-import com.example.hello_there.board.Board;
+
 import com.example.hello_there.board.photo.dto.GetS3Res;
 import com.example.hello_there.utils.S3Service;
 import lombok.RequiredArgsConstructor;
