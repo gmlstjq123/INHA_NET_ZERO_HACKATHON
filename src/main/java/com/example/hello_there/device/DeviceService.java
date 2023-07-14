@@ -1,17 +1,20 @@
 package com.example.hello_there.device;
 
+import com.example.hello_there.board.photo.PostPhoto;
+import com.example.hello_there.board.photo.PostPhotoService;
+import com.example.hello_there.board.photo.dto.GetS3Res;
 import com.example.hello_there.device.dto.GetDeviceRes;
 import com.example.hello_there.device.dto.PostAutoRegisterReq;
 import com.example.hello_there.exception.BaseException;
+import com.example.hello_there.utils.S3Service;
 import com.example.hello_there.utils.UtilService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.opencsv.exceptions.CsvConstraintViolationException;
 import com.opencsv.exceptions.CsvValidationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -36,6 +39,8 @@ import java.io.IOException;
 public class DeviceService {
     private final DeviceRepository deviceRepository;
     private final UtilService utilService;
+    private final S3Service s3Service;
+    private final PostPhotoService postPhotoService;
 
     @Transactional
     public void createDevice(PostAutoRegisterReq postAutoRegisterReq) {
@@ -131,44 +136,15 @@ public class DeviceService {
         return getDeviceRes;
     }
 
-    // 엑셀파일을 Json으로 바꾸는 메서드
     @Transactional
-    public void converetCsvToJson() throws CsvValidationException, IOException {
-        String csvFilePath = "C:\\inha_net_zero/ref.csv"; // CSV 파일 경로 및 이름
-        String jsonFilePath = "C:\\inha_net_zero/ref.json"; // JSON 파일 경로 및 이름
-
-        try {
-            FileReader reader = new FileReader(csvFilePath);
-            CSVReader csvReader = new CSVReaderBuilder(reader).withSkipLines(1).build(); // 첫 번째 줄(헤더)은 건너뜁니다.
-
-            JSONArray jsonArray = new JSONArray();
-            String[] line;
-            while ((line = csvReader.readNext()) != null) {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("column1", line[0]); // 첫 번째 열의 데이터를 "column1"로 저장
-                jsonObject.put("column2", line[1]); // 두 번째 열의 데이터를 "column2"로 저장
-                jsonObject.put("column2", line[2]);
-                jsonObject.put("column2", line[3]);
-                jsonObject.put("column2", line[4]);
-                jsonObject.put("column2", line[5]);
-                jsonObject.put("column2", line[6]);
-                jsonObject.put("column2", line[7]);
-                // 추가적으로 필요한 열이 있다면 위와 같이 계속해서 추가
-
-                jsonArray.add(jsonObject);
-            }
-
-            FileWriter fileWriter = new FileWriter(jsonFilePath);
-            fileWriter.write(jsonArray.toJSONString());
-            fileWriter.close();
-
-            csvReader.close();
-
-            System.out.println("CSV 파일이 성공적으로 JSON으로 변환되었습니다.");
-        } catch (IOException e) {
-            System.out.println("CSV 파일을 읽거나 JSON 파일을 생성하는 동안 오류가 발생했습니다: " + e.getMessage());
+    public String uploadPhoto(MultipartFile multipartFiles) {
+        if (multipartFiles != null) {
+            GetS3Res getS3Res = s3Service.uploadSingleFile(multipartFiles);
+            postPhotoService.savePhoto(getS3Res);
         }
+        return "사진 업로드를 완료했습니다";
     }
+
 
 
 }

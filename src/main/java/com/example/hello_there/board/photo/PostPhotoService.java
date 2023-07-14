@@ -1,27 +1,39 @@
-//package com.example.hello_there.board.photo;
-//
-//import com.example.hello_there.board.Board;
-//import com.example.hello_there.board.photo.dto.GetS3Res;
-//import com.example.hello_there.utils.S3Service;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.stereotype.Service;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//import java.util.ArrayList;
-//import java.util.List;
-//
-//@Service
-//@RequiredArgsConstructor
-//public class PostPhotoService {
-//
-//    private final PostPhotoRepository postPhotoRepository;
-//    private final S3Service s3Service;
-//
-//    @Transactional
-//    public void savePostPhoto(List<PostPhoto> postPhotos){
-//        postPhotoRepository.saveAll(postPhotos);
-//    }
-//
+package com.example.hello_there.board.photo;
+
+import com.example.hello_there.board.Board;
+import com.example.hello_there.board.photo.dto.GetS3Res;
+import com.example.hello_there.utils.S3Service;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+public class PostPhotoService {
+
+    private final PostPhotoRepository postPhotoRepository;
+    private final S3Service s3Service;
+
+    @Transactional
+    public void savePostPhoto(List<PostPhoto> postPhotos){
+        postPhotoRepository.saveAll(postPhotos);
+    }
+
+    @Transactional
+    public void savePhoto(GetS3Res getS3Res){
+        PostPhoto postPhoto;
+        if(getS3Res.getImgUrl() != null) {
+            postPhoto = PostPhoto.builder()
+                    .imgUrl(getS3Res.getImgUrl())
+                    .fileName(getS3Res.getFileName())
+                    .build();
+            postPhotoRepository.save(postPhoto);
+        }
+    }
+
 //    /**
 //     *  여러 개의 PostPhoto 저장
 //     */
@@ -85,4 +97,4 @@
 //            return postPhotos.get(0).getImgUrl();
 //        }
 //    }
-//}
+}

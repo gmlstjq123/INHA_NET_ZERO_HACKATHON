@@ -15,19 +15,19 @@ public class Refrigerator {
     @Column
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long refrigeratorId; //
-
-    @Column(nullable = false)
-    private DeviceType deviceType; // 업체명, 모델명, 연간에너지비용, 용량, 효율등급, 탄소배출량, 가격
+    private Long refrigeratorId;
 
     @Column(nullable = false)
     private String companyName; // 업체명
 
     @Column(nullable = false)
-    private String modelName; // 모델명
+    private String modelName; // 모델코드
 
     @Column(nullable = false)
-    private double annualCost; // 연간 에너지 비용
+    private double monthlyConsumption; // 월간 소비전력량
+
+    @Column(nullable = false)
+    private double annualCost;
 
     @Column(nullable = false)
     private double volume; // 용량
@@ -39,5 +39,11 @@ public class Refrigerator {
     private double emissionsPerHour; // 시간당 이산화탄소배출량
 
     @Column(nullable = false)
-    private String price; // 가격
+    private String name; // 모델명
+
+    @Column(nullable = false)
+    private int price; // 가격
+
+    @Column(nullable = false)
+    private int score; // 점수
 }

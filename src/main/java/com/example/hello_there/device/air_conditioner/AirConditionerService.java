@@ -1,19 +1,19 @@
-package com.example.hello_there.device.refrigerator;
+package com.example.hello_there.device.air_conditioner;
 
-import com.example.hello_there.json.JSONFileController.Ref;
+import com.example.hello_there.json.JSONFileController;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class RefrigeratorService {
-    private final RefrigeratorRepository refrigeratorRepository;
+public class AirConditionerService {
+    private final AirConditionerRepository airConditionerRepository;
 
 //    @Transactional
-//    public void converetRefCsvToJson() throws CsvValidationException, IOException {
-//        String csvFilePath = "C:\\inha_net_zero/ref.csv"; // CSV 파일 경로 및 이름
-//        String jsonFilePath = "C:\\inha_net_zero/ref.json"; // JSON 파일 경로 및 이름
+//    public void converetAirCsvToJson() throws CsvValidationException, IOException {
+//        String csvFilePath = "C:\\inha_net_zero/air.csv"; // CSV 파일 경로 및 이름
+//        String jsonFilePath = "C:\\inha_net_zero/air.json"; // JSON 파일 경로 및 이름
 //
 //        try {
 //            FileReader reader = new FileReader(csvFilePath);
@@ -49,19 +49,19 @@ public class RefrigeratorService {
 //    }
 
     @Transactional
-    public void createRefrigerator(Ref ref) {
-        Refrigerator refrigerator = Refrigerator.builder()
-                .companyName(ref.getCompanyName())
-                .modelName(ref.getModelName())
-                .monthlyConsumption(ref.getMonthlyConsumption())
-                .annualCost(ref.getAnnualCost())
-                .volume(ref.getVolume())
-                .grade(ref.getGrade())
-                .emissionsPerHour(ref.getEmissionPerHour())
-                .modelName(ref.getName())
-                .price(ref.getPrice())
-                .score(ref.getScore())
+    public void createAirConditioner(JSONFileController.Air air) {
+        AirConditioner airConditioner = AirConditioner.builder()
+                .companyName(air.getCompanyName())
+                .modelName(air.getModelName())
+                .coolingCapacity(air.getCoolingCapacity())
+                .monthlyConsumption(air.getMonthlyConsumption())
+                .energyEfficiency(air.getEnergyEfficiency())
+                .grade(air.getGrade())
+                .emissionsPerHour(air.getEmissionsPerHour())
+                .name(air.getName())
+                .price(air.getPrice())
+                .score(air.getScore())
                 .build();
-        refrigeratorRepository.save(refrigerator);
+        airConditionerRepository.save(airConditioner);
     }
 }
