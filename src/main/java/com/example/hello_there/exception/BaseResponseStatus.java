@@ -92,6 +92,7 @@ public enum BaseResponseStatus {
     ALREADY_LOGIN(false, 6004, "이미 로그인된 유저입니다."),
     NONE_EXIST_UNIV(false, 6005, "대학교 등록을 먼저 진행해주세요"),
     ALREADY_EXIST_UNIV(false, 6006, "이미 등록된 대학교에요"),
+    PYTHON_ERROR(false, 6007, "파이썬 에러"),
 
     /**
      *   7000 : 댓글 관련 오류

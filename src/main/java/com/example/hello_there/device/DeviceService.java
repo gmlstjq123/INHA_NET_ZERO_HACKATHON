@@ -1,11 +1,9 @@
 package com.example.hello_there.device;
 
-import com.example.hello_there.board.photo.PostPhoto;
 import com.example.hello_there.board.photo.PostPhotoService;
 import com.example.hello_there.board.photo.dto.GetS3Res;
 import com.example.hello_there.device.air_conditioner.AirConditioner;
 import com.example.hello_there.device.air_conditioner.AirConditionerRepository;
-import com.example.hello_there.device.dto.GetDeviceRes;
 import com.example.hello_there.device.dto.PostAutoRegisterReq;
 import com.example.hello_there.device.kimchi_refrigerator.KimchiRefrigerator;
 import com.example.hello_there.device.kimchi_refrigerator.KimchiRefrigeratorRepository;
@@ -17,7 +15,6 @@ import com.example.hello_there.device.vaccum_cleaner.VaccumCleaner;
 import com.example.hello_there.device.vaccum_cleaner.VaccumCleanerRepository;
 import com.example.hello_there.device.washing_machine.WashingMachine;
 import com.example.hello_there.device.washing_machine.WashingMachineRepository;
-import com.example.hello_there.exception.BaseException;
 import com.example.hello_there.exception.BaseResponse;
 import com.example.hello_there.exception.BaseResponseStatus;
 import com.example.hello_there.json.JSONFileController;
@@ -25,7 +22,6 @@ import com.example.hello_there.utils.S3Service;
 import com.example.hello_there.utils.UtilService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.opencsv.exceptions.CsvValidationException;
 import lombok.RequiredArgsConstructor;
 import org.python.core.PyObject;
 import org.python.util.PythonInterpreter;
@@ -42,14 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVReaderBuilder;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -132,10 +120,15 @@ public class DeviceService {
             GetS3Res getS3Res = s3Service.uploadSingleFile(multipartFiles);
             postPhotoService.savePhoto(getS3Res);
             String fileName = getS3Res.getFileName();
-            PythonInterpreter interpreter = new PythonInterpreter();
-            interpreter.exec("import test");
-            PyObject result = interpreter.eval("text.process_text_detection('" + fileName + "')");
-            String modelName = result.toString();
+            String modelName;
+            try {
+                PythonInterpreter interpreter = new PythonInterpreter();
+                interpreter.exec("import test");
+                PyObject result = interpreter.eval("text.process_text_detection('" + fileName + "')");
+                modelName = result.toString();
+            } catch (Exception exception) {
+                return new BaseResponse<>(BaseResponseStatus.PYTHON_ERROR);
+            }
 
             AirConditioner airConditioner = airConditionerRepository.findAirConditionerByModelName(modelName).orElse(null);
             if(airConditioner != null) {
