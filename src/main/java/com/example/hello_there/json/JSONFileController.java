@@ -3,8 +3,6 @@ package com.example.hello_there.json;
 import com.example.hello_there.device.air_conditioner.AirConditionerService;
 import com.example.hello_there.device.kimchi_refrigerator.KimchiRefrigeratorService;
 import com.example.hello_there.device.refrigerator.RefrigeratorService;
-import com.example.hello_there.device.rice_cooker.RiceCookerService;
-import com.example.hello_there.device.vaccum_cleaner.VaccumCleanerService;
 import com.example.hello_there.device.washing_machine.WashingMachineService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,8 +24,6 @@ public class JSONFileController {
     private final AirConditionerService airConditionerService;
     private final KimchiRefrigeratorService kimchiRefrigeratorService;
     private final RefrigeratorService refrigeratorService;
-    private final RiceCookerService riceCookerService;
-    private final VaccumCleanerService vaccumCleanerService;
     private final WashingMachineService washingMachineService;
 
     @PostMapping("/process-json/air-conditioner") // 에어컨 Json파일을 DB에 넣는다.
@@ -162,99 +158,6 @@ public class JSONFileController {
         }
     }
 
-    @PostMapping("/process-json/rice-cooker") // 밥솥 Json파일을 DB에 넣는다.
-    public void processRiceJSONFile(@RequestPart("file") MultipartFile file) {
-        try {
-            // MultiPartFile을 JsonNode로 변환
-            JsonNode jsonNode = objectMapper.readTree(file.getInputStream());
-
-            // 품목 리스트 초기화
-            List<Rice> riceList = new ArrayList<>();
-
-            // 품목 배열 순회
-            Iterator<JsonNode> itemsIterator = jsonNode.iterator();
-            while (itemsIterator.hasNext()) {
-                JsonNode itemNode = itemsIterator.next();
-
-                // 품목 정보 추출
-                String companyName = itemNode.get("업체명").asText();
-                String modelName = itemNode.get("모델명").asText();
-                int powerConsumption = itemNode.get("정격소비전력(W)").asInt();
-                int maximumCapcaity = itemNode.get("최대취사용량(인용)").asInt();
-                double standbyPower = itemNode.get("대기전력(W)").asDouble();
-                String grade = itemNode.get("효율등급").asText();
-                double emissionPerHour = itemNode.get("시간당 이산화탄소 배출량").asDouble();
-                String name = itemNode.get("모델 이름").asText();
-                int price = itemNode.get("가격").asInt();
-                int score = itemNode.get("tanso_score").asInt();
-
-                // 품목 객체 생성
-                Rice rice = new Rice(companyName, modelName, powerConsumption, maximumCapcaity,
-                        standbyPower, grade, emissionPerHour, name, price, score);
-
-                // 품목 객체를 리스트에 추가
-                riceList.add(rice);
-            }
-
-            // 품목 리스트 사용
-            for (Rice rice : riceList) {
-                riceCookerService.createRiceCooker(rice);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    @PostMapping("/process-json/vaccum-cleaner") // 청소기 Json파일을 DB에 넣는다.
-    public void processVaccumJSONFile(@RequestPart("file") MultipartFile file) {
-        try {
-            // MultiPartFile을 JsonNode로 변환
-            JsonNode jsonNode = objectMapper.readTree(file.getInputStream());
-
-            // 품목 리스트 초기화
-            List<Vac> vacList = new ArrayList<>();
-
-            // 품목 배열 순회
-            Iterator<JsonNode> itemsIterator = jsonNode.iterator();
-            while (itemsIterator.hasNext()) {
-                JsonNode itemNode = itemsIterator.next();
-
-                // 품목 정보 추출
-                String companyName = itemNode.get("업체명").asText();
-                String completeDate = itemNode.get("완료일자").asText();
-                String modelName = itemNode.get("모델명").asText();
-                String testInstitude = itemNode.get("시험기관").asText();
-                String manufacturer = itemNode.get("제조원").asText();
-                String isDomestic = itemNode.get("국산/수입").asText();
-                double powerConsumption = itemNode.get("측정소비전력(W)").asDouble();
-                double annualCost = itemNode.get("연간에너지비용(원)").asDouble();
-                double sunctionPower = itemNode.get("최대흡입일률(W)").asDouble();
-                String grade = itemNode.get("효율등급").asText();
-                double emissionPerHour = itemNode.get("시간당 이산화탄소 배출량").asDouble();
-                String name = itemNode.get("모델 이름").asText();
-                int price = itemNode.get("가격").asInt();
-                int score = itemNode.get("tanso_score").asInt();
-
-                // 품목 객체 생성
-                Vac vac = new Vac(companyName, completeDate, modelName, testInstitude,
-                        manufacturer, isDomestic, powerConsumption, annualCost,
-                        sunctionPower, grade, emissionPerHour, name, price, score);
-
-                // 품목 객체를 리스트에 추가
-                vacList.add(vac);
-            }
-
-            // 품목 리스트 사용
-            for (Vac vac : vacList) {
-                vaccumCleanerService.createVaccumCleaner(vac);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     @PostMapping("/process-json/washing-machine") // 세탁기 Json파일을 DB에 넣는다.
     public void processWashJSONFile(@RequestPart("file") MultipartFile file) {
         try {
@@ -302,6 +205,7 @@ public class JSONFileController {
     @Getter
     @Setter
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class Air {
         private String companyName;
         private String modelName;
@@ -344,44 +248,6 @@ public class JSONFileController {
         private double emissionPerHour;
         private double maxPowerConsumption;
         private double annualCost;
-        private String name;
-        private int price;
-        private int score;
-    }
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Rice {
-        private String companyName;
-        private String modelName;
-        private int powerConsumption;
-        private int maximumCapcaity;
-        private double standbyPower;
-        private String grade;
-        private double emissionPerHour;
-        private String name;
-        private int price;
-        private int score;
-    }
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Vac {
-        private String companyName;
-        private String completeDate;
-        private String modelName;
-        private String testInstitude;
-        private String manufacturer;
-        private String isDomestic;
-        private double powerConsumption;
-        private double annualCost;
-        private double sunctionPower;
-        private String grade;
-        private double emissionsPerHour;
         private String name;
         private int price;
         private int score;

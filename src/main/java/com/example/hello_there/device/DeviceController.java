@@ -9,10 +9,6 @@ import com.example.hello_there.device.kimchi_refrigerator.KimchiRefrigeratorRepo
 import com.example.hello_there.device.refrigerator.Refrigerator;
 import com.example.hello_there.device.refrigerator.RefrigeratorRepository;
 import com.example.hello_there.device.refrigerator.RefrigeratorService;
-import com.example.hello_there.device.rice_cooker.RiceCooker;
-import com.example.hello_there.device.rice_cooker.RiceCookerRepository;
-import com.example.hello_there.device.vaccum_cleaner.VaccumCleaner;
-import com.example.hello_there.device.vaccum_cleaner.VaccumCleanerRepository;
 import com.example.hello_there.device.washing_machine.WashingMachine;
 import com.example.hello_there.device.washing_machine.WashingMachineRepository;
 import com.example.hello_there.exception.BaseResponse;
@@ -31,8 +27,6 @@ public class DeviceController {
     private final AirConditionerRepository airConditionerRepository;
     private final KimchiRefrigeratorRepository kimchiRefrigeratorRepository;
     private final RefrigeratorRepository refrigeratorRepository;
-    private final RiceCookerRepository riceCookerRepository;
-    private final VaccumCleanerRepository vaccumCleanerRepository;
     private final WashingMachineRepository washingMachineRepository;
 
 //    @GetMapping("/compare")
@@ -70,22 +64,6 @@ public class DeviceController {
                     refrigerator.getName(), refrigerator.getPrice(), refrigerator.getScore());
             return new BaseResponse<>(ref);
         }
-        RiceCooker riceCooker = riceCookerRepository.findRiceCookerByModelName(modelName).orElse(null);
-        if(riceCooker != null) {
-            JSONFileController.Rice rice = new JSONFileController.Rice(riceCooker.getCompanyName(), riceCooker.getModelName(),
-                    riceCooker.getPowerConsumption(), riceCooker.getMaximumCapcaity(), riceCooker.getStandbyPower(),
-                    riceCooker.getGrade(), riceCooker.getEmissionsPerHour(), riceCooker.getName(), riceCooker.getPrice(), riceCooker.getScore());
-            return new BaseResponse<>(rice);
-        }
-        VaccumCleaner vaccumCleaner = vaccumCleanerRepository.findVaccumCleanerByModelName(modelName).orElse(null);
-        if(vaccumCleaner != null) {
-            JSONFileController.Vac vac = new JSONFileController.Vac(vaccumCleaner.getCompanyName(), vaccumCleaner.getCompleteDate(),
-                    vaccumCleaner.getModelName(), vaccumCleaner.getTestInstitude(), vaccumCleaner.getManufacturer(),
-                    vaccumCleaner.getIsDomestic(), vaccumCleaner.getPowerConsumption(), vaccumCleaner.getAnnualCost(),
-                    vaccumCleaner.getSunctionPower(), vaccumCleaner.getGrade(), vaccumCleaner.getEmissionsPerHour(), vaccumCleaner.getName(),
-                    vaccumCleaner.getPrice(), vaccumCleaner.getScore());
-            return new BaseResponse<>(vac);
-        }
         WashingMachine washingMachine = washingMachineRepository.findWashingMachineByModelName(modelName).orElse(null);
         if(washingMachine != null) {
             JSONFileController.Wash wash = new JSONFileController.Wash(washingMachine.getCompanyName(), washingMachine.getModelName(),
@@ -100,7 +78,7 @@ public class DeviceController {
     }
 
     @PostMapping("/find/photo")
-    public BaseResponse<?> findModelByPhoto(@RequestPart(value = "image", required = false) MultipartFile multipartFile) {
+    public BaseResponse<String> findModelByPhoto(@RequestPart(value = "image", required = false) MultipartFile multipartFile) {
         return new BaseResponse<>(deviceService.uploadPhoto(multipartFile));
     }
 
