@@ -131,9 +131,10 @@ public class DeviceService {
         if (multipartFiles != null) {
             GetS3Res getS3Res = s3Service.uploadSingleFile(multipartFiles);
             postPhotoService.savePhoto(getS3Res);
+            String fileName = getS3Res.getFileName();
             PythonInterpreter interpreter = new PythonInterpreter();
             interpreter.exec("import test");
-            PyObject result = interpreter.eval("text.process_text_detection()");
+            PyObject result = interpreter.eval("text.process_text_detection('" + fileName + "')");
             String modelName = result.toString();
 
             AirConditioner airConditioner = airConditionerRepository.findAirConditionerByModelName(modelName).orElse(null);
