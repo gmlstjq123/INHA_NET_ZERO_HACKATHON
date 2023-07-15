@@ -3,15 +3,32 @@ package com.example.hello_there.device;
 import com.example.hello_there.board.photo.PostPhoto;
 import com.example.hello_there.board.photo.PostPhotoService;
 import com.example.hello_there.board.photo.dto.GetS3Res;
+import com.example.hello_there.device.air_conditioner.AirConditioner;
+import com.example.hello_there.device.air_conditioner.AirConditionerRepository;
 import com.example.hello_there.device.dto.GetDeviceRes;
 import com.example.hello_there.device.dto.PostAutoRegisterReq;
+import com.example.hello_there.device.kimchi_refrigerator.KimchiRefrigerator;
+import com.example.hello_there.device.kimchi_refrigerator.KimchiRefrigeratorRepository;
+import com.example.hello_there.device.refrigerator.Refrigerator;
+import com.example.hello_there.device.refrigerator.RefrigeratorRepository;
+import com.example.hello_there.device.rice_cooker.RiceCooker;
+import com.example.hello_there.device.rice_cooker.RiceCookerRepository;
+import com.example.hello_there.device.vaccum_cleaner.VaccumCleaner;
+import com.example.hello_there.device.vaccum_cleaner.VaccumCleanerRepository;
+import com.example.hello_there.device.washing_machine.WashingMachine;
+import com.example.hello_there.device.washing_machine.WashingMachineRepository;
 import com.example.hello_there.exception.BaseException;
+import com.example.hello_there.exception.BaseResponse;
+import com.example.hello_there.exception.BaseResponseStatus;
+import com.example.hello_there.json.JSONFileController;
 import com.example.hello_there.utils.S3Service;
 import com.example.hello_there.utils.UtilService;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.opencsv.exceptions.CsvValidationException;
 import lombok.RequiredArgsConstructor;
+import org.python.core.PyObject;
+import org.python.util.PythonInterpreter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,7 +54,12 @@ import java.io.IOException;
 @Service
 @RequiredArgsConstructor
 public class DeviceService {
-    private final DeviceRepository deviceRepository;
+    private final AirConditionerRepository airConditionerRepository;
+    private final KimchiRefrigeratorRepository kimchiRefrigeratorRepository;
+    private final RefrigeratorRepository refrigeratorRepository;
+    private final RiceCookerRepository riceCookerRepository;
+    private final VaccumCleanerRepository vaccumCleanerRepository;
+    private final WashingMachineRepository washingMachineRepository;
     private final UtilService utilService;
     private final S3Service s3Service;
     private final PostPhotoService postPhotoService;
@@ -117,36 +139,72 @@ public class DeviceService {
         return totalPageCount;
     }
 
-    public GetDeviceRes compareDevice(String modelName) throws BaseException {
-        // 사용자 기기의 수치
-        Device device = utilService.findByDeviceModelNameWithValidation(modelName);
-        double annualCostDivByVol = device.getAnnualCost() / device.getVolume();
-        double emissionPerHourDivByVol = device.getEmissionsPerHour() / device.getVolume();
-        double maxPowerConsumptionDivByVol = device.getMaxPowerConsumption() / device.getVolume();
-
-        // 1등급 제품의 평균 수치
-        double avgFirstAnnualCostDivByVol = deviceRepository.getAvgFirstAnnualCostDivByVol();
-        double avgFirstemissionPerHourDivByVol = deviceRepository.getAvgFirstAnnualCostDivByVol();
-        double avgMaxPowerConsumptionDivByVol = deviceRepository.getAvgFirstAnnualCostDivByVol();
-
-        GetDeviceRes getDeviceRes = new GetDeviceRes(
-                annualCostDivByVol - avgFirstAnnualCostDivByVol,
-                emissionPerHourDivByVol - avgFirstemissionPerHourDivByVol,
-                maxPowerConsumptionDivByVol - avgMaxPowerConsumptionDivByVol);
-        return getDeviceRes;
-    }
-
     @Transactional
-    public String uploadPhoto(MultipartFile multipartFiles) {
+    public BaseResponse<?> uploadPhoto(MultipartFile multipartFiles) {
         if (multipartFiles != null) {
             GetS3Res getS3Res = s3Service.uploadSingleFile(multipartFiles);
             postPhotoService.savePhoto(getS3Res);
+            PythonInterpreter interpreter = new PythonInterpreter();
+            interpreter.exec("import test");
+            PyObject result = interpreter.eval("text.process_text_detection()");
+            String modelName = result.toString();
+
+            AirConditioner airConditioner = airConditionerRepository.findAirConditionerByModelName(modelName).orElse(null);
+            if(airConditioner != null) {
+                JSONFileController.Air air = new JSONFileController.Air(airConditioner.getCompanyName(),
+                        airConditioner.getModelName(), airConditioner.getCoolingCapacity(), airConditioner.getMonthlyConsumption(),
+                        airConditioner.getEnergyEfficiency(), airConditioner.getGrade(), airConditioner.getEmissionsPerHour(),
+                        airConditioner.getName(), airConditioner.getPrice(), airConditioner.getScore());
+                return new BaseResponse<>(air);
+            }
+            KimchiRefrigerator kimchiRefrigerator = kimchiRefrigeratorRepository.findKimchiRefrigeratorByModelName(modelName).orElse(null);
+            if(kimchiRefrigerator != null) {
+                JSONFileController.Kimchi kimchi = new JSONFileController.Kimchi(kimchiRefrigerator.getCompanyName(),
+                        kimchiRefrigerator.getModelName(), kimchiRefrigerator.getStroageEfficiency(), kimchiRefrigerator.getMonthlyConsumption(),
+                        kimchiRefrigerator.getEfficiencyRate(), kimchiRefrigerator.getGrade(), kimchiRefrigerator.getEmissionsPerHour(),
+                        kimchiRefrigerator.getName(), kimchiRefrigerator.getPrice(), kimchiRefrigerator.getScore());
+                return new BaseResponse<>(kimchi);
+            }
+            Refrigerator refrigerator = refrigeratorRepository.findRefrigeratorByModelName(modelName).orElse(null);
+            if(refrigerator != null) {
+                JSONFileController.Ref ref = new JSONFileController.Ref(refrigerator.getCompanyName(), refrigerator.getModelName(),
+                        refrigerator.getMonthlyConsumption(), refrigerator.getVolume(), refrigerator.getGrade(),
+                        refrigerator.getEmissionsPerHour(), refrigerator.getMaxPowerConsumption(), refrigerator.getAnnualCost(),
+                        refrigerator.getName(), refrigerator.getPrice(), refrigerator.getScore());
+                return new BaseResponse<>(ref);
+            }
+            RiceCooker riceCooker = riceCookerRepository.findRiceCookerByModelName(modelName).orElse(null);
+            if(riceCooker != null) {
+                JSONFileController.Rice rice = new JSONFileController.Rice(riceCooker.getCompanyName(), riceCooker.getModelName(),
+                        riceCooker.getPowerConsumption(), riceCooker.getMaximumCapcaity(), riceCooker.getStandbyPower(),
+                        riceCooker.getGrade(), riceCooker.getEmissionsPerHour(), riceCooker.getName(), riceCooker.getPrice(), riceCooker.getScore());
+                return new BaseResponse<>(rice);
+            }
+            VaccumCleaner vaccumCleaner = vaccumCleanerRepository.findVaccumCleanerByModelName(modelName).orElse(null);
+            if(vaccumCleaner != null) {
+                JSONFileController.Vac vac = new JSONFileController.Vac(vaccumCleaner.getCompanyName(), vaccumCleaner.getCompleteDate(),
+                        vaccumCleaner.getModelName(), vaccumCleaner.getTestInstitude(), vaccumCleaner.getManufacturer(),
+                        vaccumCleaner.getIsDomestic(), vaccumCleaner.getPowerConsumption(), vaccumCleaner.getAnnualCost(),
+                        vaccumCleaner.getSunctionPower(), vaccumCleaner.getGrade(), vaccumCleaner.getEmissionsPerHour(), vaccumCleaner.getName(),
+                        vaccumCleaner.getPrice(), vaccumCleaner.getScore());
+                return new BaseResponse<>(vac);
+            }
+            WashingMachine washingMachine = washingMachineRepository.findWashingMachineByModelName(modelName).orElse(null);
+            if(washingMachine != null) {
+                JSONFileController.Wash wash = new JSONFileController.Wash(washingMachine.getCompanyName(), washingMachine.getModelName(),
+                        washingMachine.getWashingCapacity(), washingMachine.getOneTimeConsumption(), washingMachine.getGrade(),
+                        washingMachine.getEfficiencyRate(), washingMachine.getEmissionsPerHour(),
+                        washingMachine.getName(), washingMachine.getPrice(), washingMachine.getScore());
+                return new BaseResponse<>(wash);
+            }
+            else {
+                return new BaseResponse<>(BaseResponseStatus.NONE_EXIST_DEVICE);
+            }
         }
-        return "사진 업로드를 완료했습니다";
+        else {
+            return new BaseResponse<>(BaseResponseStatus.NONE_EXIST_PHOTO);
+        }
     }
-
-
-
 }
 
 

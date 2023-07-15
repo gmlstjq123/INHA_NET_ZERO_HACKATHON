@@ -23,7 +23,7 @@ public class RefrigeratorController {
     private final RefrigeratorRepository refrigeratorRepository;
     @GetMapping("/read")
     public BaseResponse<Page<JSONFileController.Ref>> getRefrigerators() {
-        Pageable pageable = PageRequest.of(0, 10);
+        Pageable pageable = PageRequest.of(0, 50);
         Page<Refrigerator> refPage = refrigeratorRepository.findAll(pageable);
 
         List<JSONFileController.Ref> resultList = refPage.getContent().stream().map(ref -> {
@@ -46,4 +46,5 @@ public class RefrigeratorController {
 
         return new BaseResponse<>(resultPage);
     }
+
 }

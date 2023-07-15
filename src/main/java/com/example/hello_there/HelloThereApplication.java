@@ -12,6 +12,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories("com.example.hello_there")
 public class HelloThereApplication {
 	public static void main(String[] args) {
+
 		SpringApplication.run(HelloThereApplication.class, args);
+
 	}
 }
+
