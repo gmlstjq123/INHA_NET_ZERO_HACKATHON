@@ -64,19 +64,6 @@ public class DeviceService {
     private final S3Service s3Service;
     private final PostPhotoService postPhotoService;
 
-    @Transactional
-    public void createDevice(PostAutoRegisterReq postAutoRegisterReq) {
-        Device device = Device.builder()
-                .grade(postAutoRegisterReq.getGrade())
-                .modelName(postAutoRegisterReq.getModelName())
-                .emissionsPerHour(postAutoRegisterReq.getEmissionsPerHour())
-                .annualCost(postAutoRegisterReq.getAnnualCost())
-                .volume(postAutoRegisterReq.getVolume())
-                .maxPowerConsumption(postAutoRegisterReq.getMaxPowerConsumption())
-                .itemName(postAutoRegisterReq.getItemName())
-                .build();
-        deviceRepository.save(device);
-    }
     public List<PostAutoRegisterReq> getDeviceInfo() throws UnsupportedEncodingException {
         WebClient webClient = WebClient.create();
         String serviceKey = "3bOb7HStMQDC44spijePkGaD6QUjfK02jgBW2JVhYWPbqMQkdmHpUX5RnR94WyF4YdnbIBauhir7yZ/saAoBAg==";
