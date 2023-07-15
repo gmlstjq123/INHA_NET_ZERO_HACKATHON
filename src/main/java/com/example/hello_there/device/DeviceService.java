@@ -186,7 +186,7 @@ public class DeviceService {
                 return new BaseResponse<>(wash);
             }
             else {
-                return new BaseResponse<>(BaseResponseStatus.NONE_EXIST_DEVICE);
+                return new BaseResponse<>(BaseResponseStatus.RE_PHOTO);
             }
         }
         else {

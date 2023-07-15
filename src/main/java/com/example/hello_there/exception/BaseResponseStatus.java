@@ -36,6 +36,7 @@ public enum BaseResponseStatus {
     FAIL_TO_LOAD(false, 2021, "게시글을 불러오는데 실패했어요"),
     NONE_EXIST_DEVICE(false, 2022, "요청하신 기기는 존재하지 않아요"),
     NONE_EXIST_PHOTO(false, 2023, "사진을 올려주세요"),
+    RE_PHOTO(false, 2024, "사진을 다시찍어주세요"),
 
     /**
      * 3000 : Response 오류
