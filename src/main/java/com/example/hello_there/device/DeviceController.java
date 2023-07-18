@@ -1,19 +1,13 @@
 package com.example.hello_there.device;
 
-import com.example.hello_there.device.air_conditioner.AirConditioner;
-import com.example.hello_there.device.air_conditioner.AirConditionerRepository;
+import com.example.hello_there.air_conditioner.AirConditionerRepository;
 
 
-import com.example.hello_there.device.kimchi_refrigerator.KimchiRefrigerator;
-import com.example.hello_there.device.kimchi_refrigerator.KimchiRefrigeratorRepository;
-import com.example.hello_there.device.refrigerator.Refrigerator;
-import com.example.hello_there.device.refrigerator.RefrigeratorRepository;
-import com.example.hello_there.device.refrigerator.RefrigeratorService;
-import com.example.hello_there.device.washing_machine.WashingMachine;
-import com.example.hello_there.device.washing_machine.WashingMachineRepository;
+import com.example.hello_there.kimchi_refrigerator.KimchiRefrigeratorRepository;
+import com.example.hello_there.refrigerator.RefrigeratorRepository;
+import com.example.hello_there.refrigerator.RefrigeratorService;
+import com.example.hello_there.washing_machine.WashingMachineRepository;
 import com.example.hello_there.exception.BaseResponse;
-import com.example.hello_there.exception.BaseResponseStatus;
-import com.example.hello_there.json.JSONFileController;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,84 +32,14 @@ public class DeviceController {
 //        }
 //    }
 
-    @PostMapping("/find/text")
+    @GetMapping("/find/text")
     public BaseResponse<?> findModelByText(@RequestParam String modelName) {
-        AirConditioner airConditioner = airConditionerRepository.findAirConditionerByModelName(modelName).orElse(null);
-        if(airConditioner != null) {
-            JSONFileController.Air air = new JSONFileController.Air(airConditioner.getCompanyName(),
-                    airConditioner.getModelName(), airConditioner.getCoolingCapacity(), airConditioner.getMonthlyConsumption(),
-                    airConditioner.getEnergyEfficiency(), airConditioner.getGrade(), airConditioner.getEmissionsPerHour(),
-                    airConditioner.getName(), airConditioner.getPrice(), airConditioner.getScore());
-            return new BaseResponse<>(air);
-        }
-        KimchiRefrigerator kimchiRefrigerator = kimchiRefrigeratorRepository.findKimchiRefrigeratorByModelName(modelName).orElse(null);
-        if(kimchiRefrigerator != null) {
-            JSONFileController.Kimchi kimchi = new JSONFileController.Kimchi(kimchiRefrigerator.getCompanyName(),
-                    kimchiRefrigerator.getModelName(), kimchiRefrigerator.getStroageEfficiency(), kimchiRefrigerator.getMonthlyConsumption(),
-                    kimchiRefrigerator.getEfficiencyRate(), kimchiRefrigerator.getGrade(), kimchiRefrigerator.getEmissionsPerHour(),
-                    kimchiRefrigerator.getName(), kimchiRefrigerator.getPrice(), kimchiRefrigerator.getScore());
-            return new BaseResponse<>(kimchi);
-        }
-        Refrigerator refrigerator = refrigeratorRepository.findRefrigeratorByModelName(modelName).orElse(null);
-        if(refrigerator != null) {
-            JSONFileController.Ref ref = new JSONFileController.Ref(refrigerator.getCompanyName(), refrigerator.getModelName(),
-                    refrigerator.getMonthlyConsumption(), refrigerator.getVolume(), refrigerator.getGrade(),
-                    refrigerator.getEmissionsPerHour(), refrigerator.getMaxPowerConsumption(), refrigerator.getAnnualCost(),
-                    refrigerator.getName(), refrigerator.getPrice(), refrigerator.getScore());
-            return new BaseResponse<>(ref);
-        }
-        WashingMachine washingMachine = washingMachineRepository.findWashingMachineByModelName(modelName).orElse(null);
-        if(washingMachine != null) {
-            JSONFileController.Wash wash = new JSONFileController.Wash(washingMachine.getCompanyName(), washingMachine.getModelName(),
-                    washingMachine.getWashingCapacity(), washingMachine.getOneTimeConsumption(), washingMachine.getGrade(),
-                    washingMachine.getEfficiencyRate(), washingMachine.getEmissionsPerHour(),
-                    washingMachine.getName(), washingMachine.getPrice(), washingMachine.getScore());
-            return new BaseResponse<>(wash);
-        }
-        else {
-            return new BaseResponse<>(BaseResponseStatus.NONE_EXIST_DEVICE);
-        }
+        return deviceService.findModelByText(modelName);
     }
 
     @PostMapping("/find/photo")
     public BaseResponse<String> findModelByPhoto(@RequestPart(value = "image", required = false) MultipartFile multipartFile) {
         return new BaseResponse<>(deviceService.uploadPhoto(multipartFile));
     }
-
-
-//    @PostMapping("/auto-register") // 모든 기기 자동 등록하는 임시의 저장소
-//    public BaseResponse<String> registerDevice() {
-//        try {
-//            List<PostAutoRegisterReq> postAutoRegisterReqList = deviceService.getDeviceInfo();
-//            for (PostAutoRegisterReq postAutoRegisterReq : postAutoRegisterReqList) {
-//                deviceService.createDevice(postAutoRegisterReq);
-//            }
-//            return new BaseResponse<>("공공 데이터를 이용해 기기 정보를 DB에 추가합니다.");
-//        } catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
-//            throw new RuntimeException(e);
-//        } catch (UnsupportedEncodingException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-
-//    @PostMapping("/auto-register/kimchi-refrigerator")
-//    public BaseResponse<String> registerKimchiRefrigerator() {
-//
-//    }
-
-//    @PostMapping("/auto-register/rice-cooker")
-//    public BaseResponse<String> registerRiceCooker() {
-//
-//    }
-
-//    @PostMapping("/auto-register/vaccum-cleaner")
-//    public BaseResponse<String> registerRiceCooker() {
-//
-//    }
-//
-//    @PostMapping("/auto-register/wahing-machine")
-//    public BaseResponse<String> registerRiceCooker() {
-//
-//    }
 
 }
