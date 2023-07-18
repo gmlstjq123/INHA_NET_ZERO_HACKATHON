@@ -34,6 +34,9 @@ AWS에서 주관하는 INHA NET-Zero 해커톤에서 사용한 서버코드입�
 - **OCR** : AWS Textract, AWS S3
 - **아이디어 회의** : Slack, Zoom, Notion
 
+## 📝 프로젝트 아키텍쳐
+![프로젝트 아키텍쳐](https://github.com/gmlstjq123/INHA_NET_ZERO_HACKATHON/blob/hello_there-12/%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%20%EC%95%84%ED%82%A4%ED%85%8D%EC%B3%90.png)
+
 ## 📌 주요 기능
 - 가전기기 등록
   - 공공데이터포털에서 제공하는 가전기기의 업체명, 모델명, 소비전력량, 에너지 효율등급, 시간당 이산화탄소 배출량를 csv 파일로 가져온다.
