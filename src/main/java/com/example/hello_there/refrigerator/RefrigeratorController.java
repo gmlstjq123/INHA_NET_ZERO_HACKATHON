@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/refrigerator")
 public class RefrigeratorController {
     private final RefrigeratorService refrigeratorService;
-    @GetMapping("/read") // 냉장고에 대한 데이터를 전체 조회하여 페이지 방식으로 프론트에 전달. 프론트에서 순위별로 출력.
+    @GetMapping("/read") // 전기냉장고에 대한 데이터를 전체 조회하여 페이지 방식으로 프론트에 전달. 프론트에서 순위별로 출력.
     public BaseResponse<Page<Ref>> getRefrigerators() {
         Pageable pageable = PageRequest.of(0, 50);
         return new BaseResponse<>(refrigeratorService.getRefrigerators(pageable));

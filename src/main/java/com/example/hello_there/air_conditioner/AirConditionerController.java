@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 public class AirConditionerController {
     private final AirConditionerService airConditionerService;
 
-    @GetMapping("/read") // 김치냉장고에 대한 데이터를 전체 조회하여 페이지 방식으로 프론트에 전달. 프론트에서 순위별로 출력.
+    @GetMapping("/read") // 전기냉방기에 대한 데이터를 전체 조회하여 페이지 방식으로 프론트에 전달. 프론트에서 순위별로 출력.
     public BaseResponse<Page<Air>> getAirconditoners() {
         Pageable pageable = PageRequest.of(0, 50);
         return new BaseResponse<>(airConditionerService.getAirconditioners(pageable));
