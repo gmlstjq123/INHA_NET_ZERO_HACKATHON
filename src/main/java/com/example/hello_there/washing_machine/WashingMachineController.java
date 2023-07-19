@@ -23,7 +23,8 @@ import java.util.stream.Collectors;
 public class WashingMachineController {
 
     private final WashingMachineService washingMachineService;
-    @GetMapping("/read")
+
+    @GetMapping("/read") // 전기세탁기에 대한 데이터를 전체 조회하여 페이지 방식으로 프론트에 전달. 프론트에서 순위별로 출력.
     public BaseResponse<Page<Wash>> getWashingMachines() {
         Pageable pageable = PageRequest.of(0, 50);
         return new BaseResponse<>(washingMachineService.getWashingMachines(pageable));
